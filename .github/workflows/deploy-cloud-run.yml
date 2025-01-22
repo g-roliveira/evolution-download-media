@@ -11,6 +11,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: southamerica-east1
   SERVICE_NAME: evolution-download-media
+  REGISTRY: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}
 
 jobs:
   deploy:
@@ -35,20 +36,20 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Authorize Docker push
-        run: gcloud auth configure-docker $REGION-docker.pkg.dev  # Corrigido
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
 
       - name: Build and Push Container
         run: |-
-          docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/app:${{ github.sha }} .  # Corrigido
-          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/app:${{ github.sha }}  # Corrigido
+          docker build -t ${REGION}-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:${{ github.sha }} .
+          docker push ${REGION}-docker.pkg.dev/$PROJECT_ID/$SERVICE_NAME/$SERVICE_NAME:${{ github.sha }}
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          image: $REGION-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/app:${{ github.sha }}  # Corrigido
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           timeout: 600s
           env_vars: |
             AWS_REGION=sa-east-1
