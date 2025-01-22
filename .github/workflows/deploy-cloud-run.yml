@@ -28,6 +28,7 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
+          token_format: 'access_token'
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
@@ -35,7 +36,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Authorize Docker push
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker gcr.io
 
       - name: Build and Push Container
         run: |-
@@ -48,6 +49,7 @@ jobs:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
           image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          timeout: 600s
           env_vars: |
             AWS_REGION=sa-east-1
             S3_BUCKET=${{ secrets.S3_BUCKET }}
@@ -62,5 +64,7 @@ jobs:
             --memory=512Mi
             --cpu=1
             --min-instances=0
-            --max-instances=10
+            --max-instances=5
             --concurrency=80
+            --health-check-path=/health
+            --cpu-throttling
