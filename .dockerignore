@@ -1,0 +1,61 @@
+# Controle de versão
+.git
+.gitignore
+.gitattributes
+
+# Ambiente de desenvolvimento
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.env
+.env.*
+!.env.example
+
+# Docker
+.docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Documentação
+README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# Logs e dados temporários
+logs
+*.log
+tmp
+.tmp
+*.tmp
+*.bak
+
+# Ferramentas de desenvolvimento
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testes e cobertura
+coverage
+.nyc_output
+test
+tests
+__tests__
+*.test.js
+*.spec.js
+
+# Build e distribuição
+dist
+build
+*.tsbuildinfo
+
+# LocalStack e outros
+localstack
+*.pem
+*.key
+*.cert

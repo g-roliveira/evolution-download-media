@@ -84,6 +84,69 @@ docker stack deploy -c docker-compose-swarm.yml evolution-media
 docker service ls
 ```
 
+## 🚀 Deploy no Google Cloud Run
+
+### Pré-requisitos
+
+1. Projeto no Google Cloud Platform
+2. Workload Identity Federation configurado
+3. Service Account com as seguintes permissões:
+   - `roles/run.admin`
+   - `roles/storage.admin`
+   - `roles/iam.serviceAccountUser`
+
+### Configuração do GitHub Actions
+
+1. Configure os seguintes secrets no seu repositório GitHub:
+
+```bash
+GCP_PROJECT_ID=seu-projeto-id
+GCP_WORKLOAD_IDENTITY_PROVIDER=projects/123456789/locations/global/workloadIdentityPools/github-actions/providers/github
+GCP_SERVICE_ACCOUNT=github-actions@seu-projeto.iam.gserviceaccount.com
+AWS_ACCESS_KEY_ID=seu-access-key
+AWS_SECRET_ACCESS_KEY=seu-secret-key
+S3_BUCKET=seu-bucket
+```
+
+2. Configure o Workload Identity Federation no GCP:
+
+```bash
+# Criar pool de identidade
+gcloud iam workload-identity-pools create github-actions \
+  --location="global" \
+  --display-name="GitHub Actions"
+
+# Criar provedor de identidade
+gcloud iam workload-identity-pools providers create-oidc github \
+  --location="global" \
+  --workload-identity-pool="github-actions" \
+  --display-name="GitHub" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+# Configurar permissões da Service Account
+gcloud iam service-accounts add-iam-policy-binding \
+  "github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-actions/attribute.repository/${GITHUB_REPO}"
+```
+
+### Deploy
+
+O deploy é automático quando há push nas branches `main` ou `master`. Você também pode disparar manualmente pela aba "Actions" no GitHub.
+
+A aplicação será deployada com as seguintes configurações:
+- Região: `southamerica-east1`
+- Memória: 512Mi
+- CPU: 1
+- Instâncias: 0-10 (auto-scaling)
+- Concorrência: 80 requisições por instância
+
+Para monitorar o deploy:
+1. Acesse o Console do Google Cloud
+2. Navegue até Cloud Run
+3. Selecione o serviço `evolution-download-media`
+
 ## 📡 Endpoints
 
 ### POST /v1/download-media

@@ -1,16 +1,29 @@
 FROM node:18-alpine
 
+# Adiciona usuário não-root
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 -G nodejs
+
+# Define diretório de trabalho
 WORKDIR /app
 
-# Install dependencies
+# Instala dependências
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production && \
+    npm cache clean --force
 
-# Copy app source
-COPY . .
+# Copia apenas os arquivos necessários
+COPY --chown=nodejs:nodejs WAPI.js ./
 
-# Expose port
+# Define usuário não-root
+USER nodejs
+
+# Expõe porta
 EXPOSE 3000
 
-# Start application
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --spider -q http://localhost:3000/health || exit 1
+
+# Inicia aplicação
 CMD ["node", "WAPI.js"]
