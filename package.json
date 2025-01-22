@@ -1,0 +1,28 @@
+{
+  "name": "evolution-download-media",
+  "version": "1.0.0",
+  "description": "API for downloading and storing WhatsApp media files in S3",
+  "main": "WAPI.js",
+  "scripts": {
+    "start": "node WAPI.js",
+    "dev": "nodemon WAPI.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/lib-storage": "^3.0.0",
+    "@aws-sdk/s3-request-presigner": "^3.0.0",
+    "@whiskeysockets/baileys": "^6.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0",
+    "express-validator": "^7.0.0",
+    "mime-types": "^2.1.35",
+    "pino": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
