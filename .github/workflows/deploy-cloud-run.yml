@@ -66,6 +66,4 @@ jobs:
             --min-instances=0
             --max-instances=5
             --concurrency=80
-            --startup-probe-http-path=/health
-            --startup-probe-initial-delay=5
             --cpu-throttling
