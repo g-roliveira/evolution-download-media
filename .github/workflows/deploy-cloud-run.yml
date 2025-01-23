@@ -71,6 +71,5 @@ jobs:
         run: |-
           gcloud run domain-mappings create \
             --service=${{ env.SERVICE_NAME }} \
-            --domain=${{ secrets.GCP_DOMAIN }} \
-            --region=${{ env.REGION }} \
+            --domain=${{ secrets.API_DOMAIN }} \
             --force-override            
