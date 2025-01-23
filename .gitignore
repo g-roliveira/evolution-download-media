@@ -49,3 +49,5 @@ coverage/
 *.pem
 *.cert
 *.key
+add-missing-permission.sh
+permissoes.md
