@@ -69,7 +69,7 @@ jobs:
             --cpu-throttling
       - name: Map Custom Domain
         run: |-
-          gcloud run domain-mappings create \
+          gcloud beta run domain-mappings create \
             --service=${{ env.SERVICE_NAME }} \
             --domain=${{ secrets.API_DOMAIN }} \
             --force-override            
