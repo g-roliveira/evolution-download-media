@@ -67,10 +67,14 @@ jobs:
             --max-instances=5
             --concurrency=80
             --cpu-throttling
+
+      - name: Install gcloud beta component
+        run: gcloud components install beta --quiet
+
       - name: Map Custom Domain
         run: |-
           gcloud beta run domain-mappings create \
             --service=${{ env.SERVICE_NAME }} \
             --domain=${{ secrets.API_DOMAIN }} \
             --force-override \
-            --quiet         
+            --quiet
