@@ -72,4 +72,5 @@ jobs:
           gcloud beta run domain-mappings create \
             --service=${{ env.SERVICE_NAME }} \
             --domain=${{ secrets.API_DOMAIN }} \
-            --force-override            
+            --force-override \
+            --quiet         
