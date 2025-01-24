@@ -78,11 +78,11 @@ async function createBucket() {
 
 // Função de upload para S3 com streaming
 async function uploadToS3(stream, metadata) {
-  const { instanceId, remoteJid, mediaType, mimetype } = metadata;
+  const { instanceId, remoteJid, mediaType, mimetype, folderName } = metadata;
   
   const fileName = `${Date.now()}.${mime.extension(mimetype) || 'bin'}`;
   const objectName = sanitizeS3Path(
-    'evolution-api',
+    folderName,
     instanceId,
     remoteJid,
     mediaType,
@@ -126,7 +126,8 @@ app.post('/v1/download-media',
     body('mimetype').isMimeType().withMessage('Mimetype inválido'),
     body('remoteJid').isString().notEmpty().withMessage('remoteJid obrigatório'),
     body('mediaType').isString().notEmpty().withMessage('mediaType obrigatório'),
-    body('instanceId').isString().notEmpty().withMessage('instanceId obrigatório')
+    body('instanceId').isString().notEmpty().withMessage('instanceId obrigatório'),
+    body('folderName').optional().isString().matches(/^[a-zA-Z0-9\-_]+$/).withMessage('folderName deve conter apenas letras, números, hífen e underscore')
   ],
   async (req, res, next) => {
     try {
@@ -135,7 +136,7 @@ app.post('/v1/download-media',
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { url, mediaKey, mimetype, remoteJid, mediaType, instanceId } = req.body;
+      const { url, mediaKey, mimetype, remoteJid, mediaType, instanceId, folderName = 'whatsapp-media' } = req.body;
 
       // Validação adicional de parâmetros
       const paramRegex = /^[a-zA-Z0-9\-_@.]+$/;
@@ -179,7 +180,8 @@ app.post('/v1/download-media',
         instanceId,
         remoteJid,
         mediaType,
-        mimetype
+        mimetype,
+        folderName
       });
 
       res.json({
